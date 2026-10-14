@@ -7,7 +7,9 @@ Como funciona o rastreamento: cada link wa.me do site carrega um utm_content
 único no formato <pagina>_<secao> (ex.: wa.me/...?utm_content=inicio_heroi).
 O WhatsApp ignora o parâmetro; o GTM lê a URL clicada e sabe exatamente qual
 botão gerou o lead. Este script VARRE OS PRÓPRIOS HTML para descobrir os
-slugs, então o contêiner gerado nunca dessincroniza do que está publicado.
+slugs (no HTML gerado em dist/ — rode `npm run build` antes), então o
+contêiner nunca dessincroniza do que está publicado. Os links nascem da
+função whatsapp() de src/dados/negocio.js.
 
 O que o JSON contém:
   - variável "Click - utm_content" (URL do clique → parâmetro utm_content)
@@ -29,7 +31,7 @@ Fica manual no painel: as tags de conversão do Google Ads (dependem das
 conversões criadas na conta) e o Publicar. Ver docs/ANALYTICS.md.
 
 Uso:
-    python3 tools/gerar-gtm.py            # escreve tools/gtm-container.json
+    npm run build && python3 tools/gerar-gtm.py   # escreve tools/gtm-container.json
 """
 
 import json
@@ -60,7 +62,10 @@ ROTULOS = {
 
 def slugs_do_site():
     achados = set()
-    for arquivo in sorted(RAIZ.glob("*.html")):
+    paginas = sorted((RAIZ / "dist").glob("*.html"))
+    if not paginas:
+        sys.exit("dist/ vazio: rode `npm run build` antes")
+    for arquivo in paginas:
         texto = arquivo.read_text(encoding="utf-8")
         for m in re.finditer(r'href="https://wa\.me/[^"]*utm_content=([a-z0-9_]+)', texto):
             achados.add(m.group(1))

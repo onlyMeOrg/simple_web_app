@@ -1,0 +1,77 @@
+---
+import Base from "../layouts/Base.astro";
+import { whatsapp } from "../dados/negocio.js";
+---
+
+<Base
+  titulo="Galeria de fotos — Clínica Sorriso Pleno"
+  descricao="Fotos do consultório e da equipe da Clínica Sorriso Pleno."
+  caminho="galeria.html"
+  pagina="galeria"
+  indexavel={false}
+  scripts={["js/galeria.js"]}
+>
+  <section class="heroi">
+    <h1>Conheça nosso espaço</h1>
+    <p class="lide">
+      Um ambiente pensado para o seu conforto, da recepção ao consultório. Clique
+      numa foto para ver em tamanho maior.
+    </p>
+  </section>
+
+  <section id="fotos">
+    <div class="grade-galeria">
+      <figure>
+        <a class="item-galeria" href="./assets/galeria/recepcao.png" data-titulo="Recepção">
+          <img src="./assets/galeria/recepcao.png" alt="Recepção da clínica, com poltronas confortáveis e plantas" loading="lazy" width="900" height="675">
+        </a>
+        <figcaption>Recepção</figcaption>
+      </figure>
+      <figure>
+        <a class="item-galeria" href="./assets/galeria/consultorio-1.png" data-titulo="Consultório 1">
+          <img src="./assets/galeria/consultorio-1.png" alt="Consultório odontológico equipado, cadeira e instrumentos organizados" loading="lazy" width="900" height="675">
+        </a>
+        <figcaption>Consultório 1</figcaption>
+      </figure>
+      <figure>
+        <a class="item-galeria" href="./assets/galeria/consultorio-2.png" data-titulo="Consultório 2">
+          <img src="./assets/galeria/consultorio-2.png" alt="Segundo consultório, iluminado e climatizado" loading="lazy" width="900" height="675">
+        </a>
+        <figcaption>Consultório 2</figcaption>
+      </figure>
+      <figure>
+        <a class="item-galeria" href="./assets/galeria/equipe.png" data-titulo="Nossa equipe">
+          <img src="./assets/galeria/equipe.png" alt="Equipe de dentistas e assistentes da clínica, uniformizados" loading="lazy" width="900" height="675">
+        </a>
+        <figcaption>Nossa equipe</figcaption>
+      </figure>
+      <figure>
+        <a class="item-galeria" href="./assets/galeria/sala-espera.png" data-titulo="Sala de espera">
+          <img src="./assets/galeria/sala-espera.png" alt="Sala de espera confortável, com assentos e plantas" loading="lazy" width="900" height="675">
+        </a>
+        <figcaption>Sala de espera</figcaption>
+      </figure>
+      <figure>
+        <a class="item-galeria" href="./assets/galeria/equipamentos.png" data-titulo="Equipamentos">
+          <img src="./assets/galeria/equipamentos.png" alt="Equipamentos odontológicos modernos usados nos tratamentos" loading="lazy" width="900" height="675">
+        </a>
+        <figcaption>Equipamentos</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="faixa-cta">
+    <h2>Gostou do nosso espaço?</h2>
+    <p class="lide">Agende sua visita e conheça pessoalmente.</p>
+    <div class="grupo-botoes">
+      <a class="botao botao-primario" href={whatsapp("galeria_cta_final")} target="_blank" rel="noopener noreferrer">Agendar pelo WhatsApp</a>
+      <a class="botao" href="./contato.html">Ver formas de contato</a>
+    </div>
+  </section>
+
+  <dialog id="visualizador-foto">
+    <button type="button" class="fechar-dialogo" id="fechar-visualizador" aria-label="Fechar">✕</button>
+    <img id="imagem-visualizador" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBTAA7" alt="">
+    <p id="legenda-visualizador"></p>
+  </dialog>
+</Base>

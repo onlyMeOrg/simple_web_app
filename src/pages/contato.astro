@@ -1,0 +1,42 @@
+---
+import Base from "../layouts/Base.astro";
+import { NEGOCIO, telefoneExibicao, whatsapp } from "../dados/negocio.js";
+
+const { endereco, telefone, email, horario } = NEGOCIO;
+const enderecoCompleto = `${endereco.rua} — ${endereco.cidade}, ${endereco.estado}`;
+const mapa = new URL("https://www.google.com/maps/search/?api=1");
+mapa.searchParams.set("query", `${endereco.rua} ${endereco.cidade} ${endereco.estado}`);
+---
+
+<Base
+  titulo="Contato — Clínica Sorriso Pleno em São Paulo"
+  descricao="Endereço, telefone, e-mail e horário de atendimento da Clínica Sorriso Pleno em São Paulo. Fale conosco pelo WhatsApp ou agende sua visita."
+  descricaoSocial="Endereço, telefone e horário de atendimento. Fale conosco pelo WhatsApp ou agende sua visita."
+  caminho="contato.html"
+  pagina="contato"
+>
+  <section class="heroi">
+    <h1>Venha nos visitar</h1>
+    <p class="lide">
+      Estamos prontos para cuidar do seu sorriso. Fale com a gente pelo WhatsApp ou
+      venha até a clínica.
+    </p>
+  </section>
+
+  <section id="contato">
+    <div class="contato-grade">
+      <div class="contato-info">
+        <p>
+          <strong>Endereço:</strong> {enderecoCompleto}
+          <a href={mapa.href} target="_blank" rel="noopener noreferrer">Ver no mapa</a>
+        </p>
+        <p><strong>Telefone:</strong> <a href={`tel:${telefone.e164}`}>{telefoneExibicao}</a></p>
+        <p><strong>E-mail:</strong> <a href={`mailto:${email}`}>{email}</a></p>
+        <p><strong>Horário:</strong> {horario.texto}</p>
+      </div>
+      <div class="grupo-botoes">
+        <a class="botao botao-primario" href={whatsapp("contato_botao")} target="_blank" rel="noopener noreferrer">Falar no WhatsApp</a>
+      </div>
+    </div>
+  </section>
+</Base>

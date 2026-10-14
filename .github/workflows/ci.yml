@@ -6,26 +6,24 @@ on:
   pull_request:
 
 jobs:
-  validate-html:
-    name: Validar HTML
+  build:
+    name: Build, HTML e links
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - run: npx --yes html-validate "**/*.html"
-      # 404.html libera o CSS/JS embutidos por hash na CSP: editar um dos dois
-      # sem recalcular quebraria a página em produção, em silêncio.
-      - run: python3 tools/hash-csp-404.py --checar
-      # PRECACHE do sw.js, <noscript> × menu, sitemap × noindex, links wa.me.
-      - run: python3 tools/checar-site.py
-
-  check-links:
-    name: Verificar links
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+          cache: npm
+      - run: npm ci
+      # O build já falha sozinho em emoji no text= do WhatsApp ou slug inválido
+      # (função whatsapp() de src/dados/negocio.js).
+      - run: npm run build
+      - run: npx --yes html-validate "dist/**/*.html"
+      # Os links internos são absolutos com o base do site (/simple_web_app/...).
+      # Montar dist/ dentro de uma pasta com esse nome reproduz o GitHub Pages,
+      # e o lychee confere os links internos de verdade.
+      - run: mkdir site && cp -r dist site/simple_web_app
       - uses: lycheeverse/lychee-action@v2
         with:
           # api.github.com: evita gastar o rate limit anônimo em toda checagem de CI.
@@ -38,6 +36,7 @@ jobs:
           # localhost: exemplos de desenvolvimento citados no README.
           args: >-
             --no-progress
+            --root-dir ${{ github.workspace }}/site
             --accept 200..=204,429
             --exclude "https://api\.github\.com.*"
             --exclude "https://pgillets\.github\.io.*"
@@ -45,5 +44,5 @@ jobs:
             --exclude "https://www\.instagram\.com.*"
             --exclude "https://www\.facebook\.com.*"
             --exclude "http://localhost.*"
-            "**/*.html" "**/*.md"
+            "site/**/*.html" "*.md" "docs/*.md"
           fail: true

@@ -1,0 +1,191 @@
+---
+/*
+ * Base.astro — o <head>, o cabeçalho e o rodapé de TODAS as páginas.
+ *
+ * É o único lugar a editar para mudar meta tags, CSP, menu ou rodapé. Antes,
+ * essas ~75 linhas eram copiados em cada .html; no site real feito a partir
+ * do template, 10 de 24 commits precisaram repetir a mesma mudança em todas
+ * as páginas (ver docs/DECISAO-STACK.md).
+ *
+ * CSS e JS ficam em public/ e são servidos como estão, sem passar pelo
+ * bundler do Astro: nada é embutido no HTML, então a CSP abaixo continua
+ * simples ('self', sem hashes, sem 'unsafe-inline').
+ */
+import { GTM_CONTAINER_ID, MENU, NEGOCIO, telefoneExibicao } from "../dados/negocio.js";
+
+interface Props {
+  /** <title> e og:title. */
+  titulo: string;
+  /** meta description (busca). */
+  descricao: string;
+  /** og:description / twitter:description; padrão = descricao. */
+  descricaoSocial?: string;
+  /** Arquivo da página ("" para a inicial, "sobre.html"...). Gera canonical e og:url. */
+  caminho: string;
+  /** Item do menu marcado com aria-current. */
+  pagina?: string;
+  /** false = noindex, follow (e fora do sitemap). */
+  indexavel?: boolean;
+  /** Scripts de módulo extras desta página, relativos a public/. */
+  scripts?: string[];
+  /** Só a página inicial: dados estruturados do negócio. */
+  jsonLd?: boolean;
+}
+
+const {
+  titulo,
+  descricao,
+  descricaoSocial = descricao,
+  caminho,
+  pagina,
+  indexavel = true,
+  scripts = [],
+  jsonLd = false,
+} = Astro.props;
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const raizDoSite = new URL(base, Astro.site);
+const canonical = new URL(caminho, raizDoSite).href;
+const imagemSocial = new URL("assets/og-capa-negocio.png", raizDoSite).href;
+const { endereco } = NEGOCIO;
+
+// Sem GTM, a CSP é a mais estrita possível. Com GTM, abre só os hosts que o
+// Google tag e o Pixel da Meta realmente usam — lista levantada pelos
+// bloqueios vistos no depurador do GTM num site em produção (docs/ANALYTICS.md).
+const CSP_BASE = "default-src 'self'; style-src 'self'; font-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'";
+const CSP_ANALYTICS = [
+  "img-src 'self' data: https://www.facebook.com https://www.googletagmanager.com https://*.google-analytics.com https://www.google.com https://www.google.com.br https://googleads.g.doubleclick.net https://ad.doubleclick.net",
+  "script-src 'self' https://www.googletagmanager.com https://connect.facebook.net https://www.googleadservices.com https://googleads.g.doubleclick.net",
+  "connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://www.facebook.com https://connect.facebook.net https://www.google.com https://www.google.com.br https://googleads.g.doubleclick.net https://ad.doubleclick.net",
+  "frame-src https://www.googletagmanager.com https://td.doubleclick.net",
+].join("; ");
+const csp = GTM_CONTAINER_ID ? `${CSP_BASE}; ${CSP_ANALYTICS}` : `${CSP_BASE}; img-src 'self' data:`;
+
+const DIAS_SCHEMA = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+// Um <script type="application/ld+json"> é dado inerte, não código: a CSP
+// não precisa (nem deve) abrir exceção para ele. Só na página inicial, a URL
+// canônica do negócio.
+const dadosEstruturados = jsonLd && {
+  "@context": "https://schema.org",
+  "@type": NEGOCIO.tipoSchema,
+  "@id": `${raizDoSite.href}#negocio`,
+  name: NEGOCIO.nome,
+  image: imagemSocial,
+  url: raizDoSite.href,
+  telephone: NEGOCIO.telefone.e164,
+  priceRange: NEGOCIO.priceRange,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: endereco.rua,
+    addressLocality: endereco.cidade,
+    addressRegion: endereco.estado,
+    postalCode: endereco.cep,
+    addressCountry: endereco.pais,
+  },
+  geo: { "@type": "GeoCoordinates", ...NEGOCIO.geo },
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: NEGOCIO.horario.dias.map((d) => DIAS_SCHEMA[d]),
+      opens: NEGOCIO.horario.abre,
+      closes: NEGOCIO.horario.fecha,
+    },
+  ],
+  ...(NEGOCIO.avaliacao && {
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: String(NEGOCIO.avaliacao.nota),
+      reviewCount: String(NEGOCIO.avaliacao.quantidade),
+    },
+  }),
+  sameAs: NEGOCIO.redes,
+};
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR" data-gtm={GTM_CONTAINER_ID || undefined}>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content={csp}>
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  {!indexavel && <meta name="robots" content="noindex, follow">}
+
+  <title>{titulo}</title>
+  <meta name="description" content={descricao}>
+
+  <link rel="canonical" href={canonical}>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content={NEGOCIO.nome}>
+  <meta property="og:title" content={titulo}>
+  <meta property="og:description" content={descricaoSocial}>
+  <meta property="og:url" content={canonical}>
+  <meta property="og:image" content={imagemSocial}>
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content={titulo}>
+  <meta name="twitter:description" content={descricaoSocial}>
+  <meta name="twitter:image" content={imagemSocial}>
+
+  {/* color-scheme também no HTML: sinal extra para motores de "modo escuro forçado" (Samsung Internet). */}
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f7fb">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e1118">
+
+  <link rel="icon" href={`${base}assets/favicon.svg`} type="image/svg+xml">
+  <link rel="apple-touch-icon" href={`${base}assets/icones/icone-192.png`}>
+
+  <link rel="stylesheet" href={`${base}css/tokens.css`}>
+  <link rel="stylesheet" href={`${base}css/base.css`}>
+  <link rel="stylesheet" href={`${base}css/componentes.css`}>
+  <link rel="stylesheet" href={`${base}css/negocio.css`}>
+
+  {/* Anti-FOUC: aplica o tema salvo ANTES do primeiro paint. Script clássico e bloqueante de propósito.
+      is:inline = o Astro não processa nem embute: sai como <script src> comum. */}
+  <script is:inline src={`${base}js/tema-boot.js`}></script>
+  <script is:inline type="module" src={`${base}js/site.js`}></script>
+  {scripts.map((s) => <script is:inline type="module" src={`${base}${s}`}></script>)}
+
+  {dadosEstruturados && <script type="application/ld+json" set:html={JSON.stringify(dadosEstruturados)} />}
+</head>
+<body>
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="topo">
+    <div class="topo-conteudo">
+      <a class="marca" href={base}>
+        <img src={`${base}assets/favicon.svg`} alt="" width="22" height="22">
+        <span>{NEGOCIO.nome}</span>
+      </a>
+      <nav aria-label="Navegação principal">
+        {MENU.map((item) => (
+          <a href={`${base}${item.href}`} aria-current={item.pagina && item.pagina === pagina ? "page" : undefined}>
+            {item.rotulo}
+          </a>
+        ))}
+      </nav>
+      {/* Escondido até js/tema.js assumir: sem JS, não existe botão que não funciona. */}
+      <button type="button" id="alternar-tema" aria-label="Alternar tema" hidden></button>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <slot />
+  </main>
+
+  <footer class="rodape rodape-negocio">
+    <div class="rodape-conteudo">
+      <div>
+        <strong>{NEGOCIO.nome}</strong>
+        <p>{endereco.rua} — {endereco.cidade}, {endereco.estado} · {telefoneExibicao}</p>
+      </div>
+      <p>
+        <a href={`${base}privacidade.html`}>Política de Privacidade</a><span class="gerenciar-cookies-item" hidden>{" · "}<a href="#" class="gerenciar-cookies">Gerenciar cookies</a></span>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

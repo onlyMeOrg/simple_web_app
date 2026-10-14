@@ -1,0 +1,108 @@
+---
+import Base from "../layouts/Base.astro";
+import { NEGOCIO, whatsapp } from "../dados/negocio.js";
+
+const { horario, avaliacao } = NEGOCIO;
+const nota = avaliacao && avaliacao.nota.toLocaleString("pt-BR");
+---
+
+<Base
+  titulo="Clínica Sorriso Pleno — Odontologia em São Paulo"
+  descricao="Clínica odontológica completa em São Paulo: limpeza, clareamento, ortodontia e implantes, com atendimento humanizado. Agende sua consulta pelo WhatsApp."
+  descricaoSocial="Odontologia completa para toda a família, com atendimento humanizado e tecnologia de ponta."
+  caminho=""
+  pagina="inicio"
+  jsonLd
+>
+  <section class="heroi">
+    <h1>Seu sorriso merece o melhor cuidado</h1>
+    <p class="lide">
+      Odontologia completa para toda a família, com atendimento humanizado e
+      tecnologia de ponta, no coração de São Paulo.
+    </p>
+    {/*
+      Calculado de verdade em js/site.js a partir do horário de
+      src/dados/negocio.js — o mesmo que gera o JSON-LD, então os dois não
+      dessincronizam. Sem JavaScript, o selo some e não atrapalha em nada:
+      o horário continua visível como texto em contato.html.
+    */}
+    <selo-status
+      id="selo-horario"
+      status="aviso"
+      texto="Verificando horário…"
+      data-dias={horario.dias.join(",")}
+      data-abre={horario.abre}
+      data-fecha={horario.fecha}
+    ></selo-status>
+    <div class="grupo-botoes">
+      <a class="botao botao-primario" href={whatsapp("inicio_heroi")} target="_blank" rel="noopener noreferrer">
+        Agendar pelo WhatsApp
+      </a>
+      <a class="botao" href="#servicos">Ver serviços</a>
+    </div>
+  </section>
+
+  <section id="servicos">
+    <h2>Nossos serviços</h2>
+    <p class="lide">Cuidado completo para a sua saúde bucal, em cada etapa da vida.</p>
+    <div class="grade-servicos">
+      <article class="card-servico">
+        <span class="card-servico-icone" aria-hidden="true">🦷</span>
+        <h3>Limpeza e prevenção</h3>
+        <p>Profilaxia, remoção de tártaro e orientação para manter o sorriso saudável entre as consultas.</p>
+      </article>
+      <article class="card-servico">
+        <span class="card-servico-icone" aria-hidden="true">✨</span>
+        <h3>Clareamento dental</h3>
+        <p>Técnicas seguras de clareamento, no consultório ou em casa, com acompanhamento profissional.</p>
+      </article>
+      <article class="card-servico">
+        <span class="card-servico-icone" aria-hidden="true">😬</span>
+        <h3>Ortodontia</h3>
+        <p>Aparelhos fixos e alinhadores transparentes para todas as idades, com plano de tratamento personalizado.</p>
+      </article>
+      <article class="card-servico">
+        <span class="card-servico-icone" aria-hidden="true">🦴</span>
+        <h3>Implantes</h3>
+        <p>Reabilitação de dentes ausentes com implantes de alta durabilidade e planejamento digital.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="prova-social">
+    <h2>Por que escolher a Clínica Sorriso Pleno</h2>
+    <div class="prova-social-grade">
+      {/* Mesmos números do "aggregateRating" do JSON-LD: o Google exige que o dado estruturado apareça na página. */}
+      {avaliacao && (
+        <div class="stat">
+          <span class="stat-valor">{nota}</span>
+          <estrela-avaliacao class="stat-estrelas" valor={Math.round(avaliacao.nota)} somente-leitura aria-label={`Avaliação média: ${nota} de 5 estrelas`}></estrela-avaliacao>
+          <span class="stat-rotulo">{avaliacao.quantidade} avaliações</span>
+        </div>
+      )}
+      <blockquote class="depoimento">
+        <p>"Atendimento excelente, super atenciosos e o resultado do meu clareamento ficou incrível. Recomendo de olhos fechados."</p>
+        <footer><span aria-hidden="true">★★★★★</span> Marina C.</footer>
+      </blockquote>
+    </div>
+  </section>
+
+  <section id="sobre-resumo">
+    <h2>Quem cuida do seu sorriso</h2>
+    <p class="lide">
+      Há mais de <strong>15 anos</strong> cuidamos da saúde bucal de famílias inteiras
+      em São Paulo — já são mais de <strong>3.000 pacientes atendidos</strong> — com
+      atendimento humanizado e equipamentos modernos, do primeiro contato ao
+      pós-tratamento.
+    </p>
+    <p><a class="botao" href="./sobre.html">Conheça nossa história completa →</a></p>
+  </section>
+
+  <section class="faixa-cta">
+    <h2>Pronto para agendar sua consulta?</h2>
+    <div class="grupo-botoes">
+      <a class="botao botao-primario" href={whatsapp("inicio_cta_final")} target="_blank" rel="noopener noreferrer">Agendar pelo WhatsApp</a>
+      <a class="botao" href="./contato.html">Ver outras formas de contato</a>
+    </div>
+  </section>
+</Base>

@@ -1,12 +1,16 @@
 # Domínio personalizado
 
 > **English summary**: this is the runbook for pointing a custom domain at this GitHub
-> Pages site later. Activation is a one-line `CNAME` file commit; DNS records and the
-> HTTPS/verification steps are documented below in Portuguese. The app code needs
-> **zero changes** — every internal path across the site's pages is already relative.
+> Pages site later. Activation is a Settings → Pages entry plus `astro.config.mjs`; DNS records and the
+> HTTPS/verification steps are documented below in Portuguese. In the code, it's a
+> two-line change in `astro.config.mjs` (`site` = the domain, remove `base`).
 
 Este guia é executado **quando** houver um domínio escolhido. Até lá, o site vive em
 `https://pgillets.github.io/simple_web_app/` e nada aqui precisa ser feito.
+
+> **Deploy por GitHub Actions** (o caso deste template): o arquivo `CNAME` na raiz **não**
+> é usado — o domínio é configurado só em Settings → Pages → Custom domain. As seções de
+> DNS e HTTPS abaixo valem igual.
 
 ## 1. Visão geral
 
@@ -19,8 +23,8 @@ processo de build (continua não existindo nenhum).
 - Ter o domínio registrado e acesso ao painel de DNS dele.
 - Decidir a forma canônica: domínio apex (`exemplo.com.br`), `www` (`www.exemplo.com.br`)
   ou um subdomínio (`app.exemplo.com.br`). A recomendação é configurar **apex + www**
-  juntos (o GitHub redireciona um para o outro automaticamente), com o `CNAME` do
-  repositório apontando para a forma escolhida como canônica.
+  juntos (o GitHub redireciona um para o outro automaticamente), com o Custom domain do
+  Pages apontando para a forma escolhida como canônica.
 
 ## 3. Verificar o domínio no GitHub (antes de tudo)
 
@@ -83,19 +87,12 @@ Outros cuidados:
   troca, para acelerar a propagação.
 - Remova registros conflitantes (A/AAAA/ALIAS antigos, CNAMEs de parking).
 
-## 5. O commit de uma linha
+## 5. Configurar o domínio
 
-Crie o arquivo `CNAME` na raiz do repositório, na branch `main`, contendo **só** o
-domínio escolhido (sem `http://`, sem barra final):
-
-```
-exemplo.com.br
-```
-
-Esse commit é suficiente: o próximo deploy do Pages lê o arquivo e preenche sozinho o
-campo "Custom domain" em Settings → Pages. (O caminho inverso também funciona — digitar
-o domínio direto em Settings → Pages cria esse mesmo commit automaticamente — mas dê
-preferência ao commit direto, que é rastreável no histórico do repositório.)
+1. **Settings → Pages → Custom domain**: informe o domínio e salve.
+2. Em `astro.config.mjs`, troque `site` pelo domínio (`https://exemplo.com.br`) e apague
+   a linha `base` — o site passa a viver na raiz. Canonical, og:url, JSON-LD,
+   `sitemap.xml`, `robots.txt` e o destino do 404 derivam daí.
 
 ## 6. HTTPS
 
@@ -105,31 +102,16 @@ preferência ao commit direto, que é rastreável no histórico do repositório.
 3. Assim que o certificado existir, marque **"Enforce HTTPS"**. Antes disso a opção
    fica desabilitada — não esqueça de voltar e marcá-la.
 
-## 7. Checklist pós-migração (só código, sem risco)
+## 7. Checklist pós-migração
 
-O código da aplicação não precisa de nenhuma mudança — todos os caminhos internos
-(CSS, JS, imagens, links entre páginas) já são relativos e funcionam em qualquer base.
-O que **vale a pena** atualizar, por serem as únicas URLs absolutas do projeto:
-
-- [ ] `index.html`: `<link rel="canonical">`, `og:url`, `og:image`, `twitter:image` e as URLs dentro do
-      bloco `<script type="application/ld+json">` → novo domínio.
-- [ ] `sobre.html`, `contato.html`, `galeria.html`, `privacidade.html`:
-      `<link rel="canonical">`, `og:url`, `og:image`, `twitter:image` → novo domínio.
-- [ ] `robots.txt`: a linha `Sitemap:` → novo domínio.
-- [ ] `sitemap.xml`: a(s) `<loc>` → novo domínio (já existem desde o início — só
-      trocar a URL, não recriar).
 - [ ] `.github/workflows/ci.yml`: troque o `--exclude` de `pgillets\.github\.io` pelo
-      domínio novo — o lychee não deve checar a própria URL de produção (dependência
-      circular entre o CI e o Pages publicado).
-- [ ] `404.html`: com domínio próprio o destino do redirecionamento é sempre `/`; a
-      detecção do subcaminho do project page pode virar `var destino = "/";` (depois,
-      `python3 tools/hash-csp-404.py`). `tools/servidor.py --base` também deixa de ser
-      necessário.
+      domínio novo (o lychee não deve checar a própria URL de produção) e o nome da pasta
+      em `cp -r dist site/simple_web_app` — sem `base`, vira `cp -r dist site`.
 - [ ] Atualizar as URLs mencionadas no `README.md`.
 - [ ] Se usar a Meta (Pixel/anúncios), verifique o domínio novo por meta tag — ver
       [`ANALYTICS.md`](ANALYTICS.md#armadilhas-já-pisadas).
-- [ ] Nada a fazer com a URL antiga: `pgillets.github.io/simple_web_app/`
-      passa a redirecionar (301) para o domínio novo automaticamente.
+- [ ] Nada a fazer com a URL antiga: `pgillets.github.io/simple_web_app/` passa a
+      redirecionar (301) para o domínio novo automaticamente.
 
 ## 8. Solução de problemas
 
@@ -137,5 +119,5 @@ O que **vale a pena** atualizar, por serem as únicas URLs absolutas do projeto:
 |---|---|
 | DNS não verifica no Settings → Pages | Propagação ainda em andamento (pode levar até 24-48h); confira com `dig` se os registros já resolvem. |
 | "Enforce HTTPS" continua cinza | O certificado ainda não foi emitido — normalmente resolve sozinho; verifique se há um CAA record bloqueando o Let's Encrypt. |
-| Domínio abre mas mostra 404 do GitHub | O arquivo `CNAME` foi removido (algumas ferramentas de build/deploy o apagam); confirme que ele ainda existe na raiz da `main`. |
+| Domínio abre mas mostra 404 do GitHub | O campo Custom domain em Settings → Pages ficou vazio, ou o último deploy falhou — confira a aba Actions. |
 | Alguém "roubou" o subdomínio antigo | É por isso que o Passo 3 (verificação) deve ser feito antes de qualquer coisa. |

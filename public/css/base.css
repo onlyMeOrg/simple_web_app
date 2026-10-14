@@ -2,6 +2,12 @@
  * base.css — reset leve, tipografia, layout do documento e acessibilidade.
  */
 
+/* `hidden` sempre vence: componentes com display próprio (ex.: o botão de
+   tema, que é display: grid) só aparecem quando o JS remove o atributo. */
+[hidden] {
+  display: none !important;
+}
+
 *,
 *::before,
 *::after {
