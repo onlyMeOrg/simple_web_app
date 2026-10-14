@@ -289,6 +289,7 @@ assets/
   favicon.svg, icones/, og-capa-negocio.png
 docs/DOMINIO.md     → runbook de domínio personalizado
 docs/ANALYTICS.md   → como ligar GTM/GA4/Ads/Pixel (CSP já mapeada)
+docs/DECISAO-STACK.md → zero-build × Astro: análise com dados e recomendação
 tools/
   servidor.py       → servidor de desenvolvimento (stdlib, sem dependências)
   checar-site.py    → confere PRECACHE, menu sem JS, sitemap e links de WhatsApp (CI)
