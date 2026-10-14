@@ -1,0 +1,42 @@
+---
+/*
+ * 404.astro → 404.html, que o GitHub Pages serve para qualquer caminho
+ * inexistente — inclusive aninhado, como /a/b/c. Por isso todo endereço
+ * aqui é ABSOLUTO (com o base do site): um "./css/..." relativo apontaria
+ * para /a/b/css/... e a página perderia estilo e redirecionamento justamente
+ * quando precisa deles. Com isso, CSS e JS podem ficar em arquivo e a CSP
+ * continua estrita, sem hash nem 'unsafe-inline'.
+ *
+ * Sem o layout Base de propósito: página mínima, sem menu, sem analytics.
+ */
+import { NEGOCIO } from "../dados/negocio.js";
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Página não encontrada · {NEGOCIO.nome}</title>
+  <meta name="robots" content="noindex">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f7fb">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e1118">
+  <link rel="icon" href={`${base}assets/favicon.svg`} type="image/svg+xml">
+  <link rel="stylesheet" href={`${base}css/tokens.css`}>
+  <link rel="stylesheet" href={`${base}css/pagina-404.css`}>
+</head>
+<body class="pagina-404">
+  <div class="caixa">
+    <h1>Página não encontrada</h1>
+    <p>O caminho <code id="caminho"></code> não existe neste site.</p>
+    <p><a id="link-inicio" class="botao-inicio" href={base}>Voltar ao início</a></p>
+    <p class="aviso-redirecionamento">Redirecionando automaticamente em instantes…</p>
+  </div>
+  <script is:inline src={`${base}js/pagina-404.js`}></script>
+</body>
+</html>

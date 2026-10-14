@@ -1,0 +1,52 @@
+---
+import Base from "../layouts/Base.astro";
+import { whatsapp } from "../dados/negocio.js";
+---
+
+<Base
+  titulo="Política de Privacidade — Clínica Sorriso Pleno"
+  descricao="Como a Clínica Sorriso Pleno trata seus dados e usa cookies no site."
+  caminho="privacidade.html"
+  pagina="privacidade"
+  indexavel={false}
+>
+  <section class="heroi">
+    <h1>Política de Privacidade</h1>
+    <p class="lide">
+      Como a Clínica Sorriso Pleno trata os seus dados e usa cookies neste site.
+    </p>
+  </section>
+
+  <section id="cookies">
+    <h2>Cookies e ferramentas de análise</h2>
+    <p>
+      Podemos usar cookies para entender como as pessoas navegam pelo site — quais
+      páginas visitam, de onde vieram e quais anúncios trouxeram essa visita. Isso
+      nos ajuda a melhorar o site e a investir melhor em divulgação.
+    </p>
+    <p>
+      Essas informações são coletadas por ferramentas de terceiros, como o
+      <strong>Google Tag Manager</strong> (que pode incluir o Google Analytics e o
+      Google Ads) e o <strong>Pixel da Meta</strong>, que recebem dados como o seu
+      endereço IP e as páginas visitadas. Nenhuma delas carrega automaticamente:
+      só começam a funcionar depois que você clica em "Aceitar" na faixa de
+      cookies exibida na primeira visita.
+    </p>
+    <p>
+      Você pode mudar sua escolha a qualquer momento pelo link "Gerenciar
+      cookies" no rodapé de qualquer página.
+    </p>
+  </section>
+
+  <section id="dados">
+    <h2>Seus dados</h2>
+    <p>
+      Não vendemos nem compartilhamos seus dados além do necessário para essas
+      ferramentas funcionarem. Para saber mais, pedir a exclusão dos seus dados ou
+      tirar qualquer dúvida, fale com a gente.
+    </p>
+    <div class="grupo-botoes">
+      <a class="botao botao-primario" href={whatsapp("privacidade_dados")} target="_blank" rel="noopener noreferrer">Falar no WhatsApp</a>
+    </div>
+  </section>
+</Base>

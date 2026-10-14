@@ -1,10 +1,10 @@
 /*
  * consentimento.js — faixa de cookies + carregamento do Google Tag Manager.
  *
- * DESLIGADO POR PADRÃO: com GTM_CONTAINER_ID vazio, nada acontece — sem
- * faixa, sem rastreador, e o link "Gerenciar cookies" do rodapé continua
- * escondido. Para ligar, siga docs/ANALYTICS.md (são dois passos: o ID
- * abaixo e a CSP de cada página).
+ * DESLIGADO POR PADRÃO: sem o ID do contêiner, nada acontece — sem faixa,
+ * sem rastreador, e o link "Gerenciar cookies" do rodapé continua escondido.
+ * Para ligar, preencha GTM_CONTAINER_ID em src/dados/negocio.js: o layout
+ * abre a CSP sozinho (docs/ANALYTICS.md).
  *
  * Ligado, nenhum código de terceiro (GTM e, dentro dele, GA4, Google Ads,
  * Pixel da Meta) executa antes do visitante clicar em "Aceitar". Sem Consent
@@ -17,8 +17,9 @@
  * de fora de propósito: dispara sem qualquer chance de checar consentimento.
  */
 
-// "GTM-XXXXXXX" do painel do Google Tag Manager. Vazio = analytics desligado.
-const GTM_CONTAINER_ID = "";
+// "GTM-XXXXXXX", escrito no <html data-gtm> pelo build a partir de
+// src/dados/negocio.js — o mesmo valor que abre a CSP. Ausente = desligado.
+const GTM_CONTAINER_ID = document.documentElement.dataset.gtm ?? "";
 
 const CHAVE = "consentimento-cookies";
 

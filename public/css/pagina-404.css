@@ -1,0 +1,47 @@
+/*
+ * pagina-404.css — estilos exclusivos de 404.html. As cores vêm de
+ * tokens.css, então acompanham o tema do sistema como o resto do site.
+ */
+
+.pagina-404 {
+  margin: 0;
+  font-family: var(--fonte);
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.pagina-404 a {
+  color: var(--cor-destaque-forte);
+}
+
+.pagina-404 .caixa {
+  max-width: 30rem;
+}
+
+.pagina-404 h1 {
+  font-size: 1.6rem;
+  margin: 0 0 0.6rem;
+}
+
+.pagina-404 .botao-inicio {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.55rem 1.3rem;
+  border-radius: 999px;
+  background: var(--cor-destaque);
+  color: var(--cor-sobre-destaque);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.pagina-404 .aviso-redirecionamento {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}

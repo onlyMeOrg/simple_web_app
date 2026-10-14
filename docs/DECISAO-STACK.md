@@ -90,3 +90,44 @@ sendo o que este template já produz. O que muda é a fonte:
 Referências: [Astro — CSP experimental](https://v5.docs.astro.build/en/reference/experimental-flags/csp/),
 [Astro 5.9](https://astro.build/blog/astro-590/),
 [Astro — deploy no GitHub Pages](https://docs.astro.build/en/guides/deploy/github/).
+
+## 5. Resultado do piloto (Astro 7.3.5, sem service worker)
+
+Feito em seguida, a partir das recomendações acima.
+
+**Como ficou**: o Astro é usado **só como gerador de HTML**. CSS e JS continuam arquivos
+comuns em `public/`, copiados como estão — nenhum `<style>` ou `<script>` passa pelo
+bundler, então nada é embutido no HTML e a CSP segue `'self'` puro, sem hashes e sem o
+suporte de CSP do próprio Astro (`security.csp`, estável na linha 7). Versão fixada em
+`7.3.5` (três semanas de publicada), não na mais recente.
+
+| | Antes (zero-build) | Depois (Astro) |
+|---|---|---|
+| Linhas das páginas | 885 em 6 `.html` | 409 em 6 `.astro` + 320 de layout, dados e config |
+| Arquivos de suporte só para compensar a repetição | 622 linhas (`sw.js`, `sw-registro.js`, `<cabecalho-site>`, manifesto, `checar-site.py`, `hash-csp-404.py`, `servidor.py`, `robots.txt`, `sitemap.xml`) | 0 |
+| Mudar o rodapé, uma meta tag ou a CSP | 5 arquivos (11 na Mentalize) | 1 arquivo |
+| Ligar o GTM | ID + CSP colada em cada página | 1 linha em `src/dados/negocio.js` |
+| Página nova | 5 passos (HTML, menu JS, `<noscript>` em todas, `sw.js`, sitemap) | 1 arquivo (+1 linha no menu) |
+| Dependências | nenhuma | 1 direta (`astro`), ~290 pacotes / 169 MB em `node_modules` — só no build, nada vai para o site |
+| Deploy | Deploy from a branch | GitHub Actions (`deploy.yml`) |
+
+**O que saiu e por quê**:
+- **Service worker e manifesto (PWA)**: offline tem pouco valor num site institucional, e
+  a regra de subir a `VERSAO` pesou em 14 de 24 commits da Mentalize.
+- **`<cabecalho-site>` e os `<noscript>`**: o menu sai pronto no HTML.
+- **`checar-site.py`**: o que ele conferia não tem mais como divergir (sitemap gerado do
+  próprio HTML, menu num lugar só, sem PRECACHE). A regra do WhatsApp virou a função
+  `whatsapp()`, que faz o build falhar.
+- **`hash-csp-404.py`**: com o `base` conhecido no build, a 404 usa endereços absolutos e
+  carrega CSS/JS de arquivo, sem hash.
+- **`servidor.py`**: substituído por `npm run dev` / `npm run preview`.
+
+**Verificado**: `html-validate` limpo no HTML gerado; no Chromium, as 5 páginas sem erro
+de console nem requisição externa, menu com `aria-current` certo, menu presente e botão de
+tema escondido com JS desligado, lightbox da galeria, selo "Aberto agora" calculado a
+partir dos dados, 404 redirecionando em `/naoexiste.html` e `/a/b/c`; com um ID de GTM de
+teste, a CSP abre sozinha, nada de terceiro carrega antes do aceite e só o `gtm.js` depois.
+
+**O que fica pior**: editar exige Node 22 e `npm install`; quem só sabe HTML ainda edita os
+`.astro` (é HTML), mas precisa de `npm run dev` para ver o resultado. E a primeira
+publicação exige trocar Settings → Pages → Source para **GitHub Actions**.

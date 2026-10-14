@@ -58,6 +58,7 @@ function atualizarBotao() {
 }
 
 export function iniciarTema(botao) {
+  botao.hidden = false; // vem escondido no HTML: sem JS, não há botão inútil
   botao.addEventListener("click", alternarTema);
   // Se o sistema mudar de tema e não houver escolha salva, o ícone acompanha.
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", atualizarBotao);
