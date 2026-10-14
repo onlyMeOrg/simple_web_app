@@ -3,8 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--
+    CSP tão estrita quanto a das demais páginas, mas com o CSS e o JS
+    embutidos liberados por HASH, não por arquivo externo: este HTML é
+    servido em QUALQUER caminho inexistente (inclusive aninhado, como
+    /a/b/c), onde um "./css/..." relativo apontaria para um lugar que não
+    existe — e a página perderia o estilo e o redirecionamento justamente
+    quando precisa deles. Sem 'unsafe-inline'.
+
+    Mexeu no <style> ou no <script> abaixo? O hash muda: recalcule com
+      python3 tools/hash-csp-404.py
+    (o console do navegador também mostra o hash esperado ao bloquear).
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'sha256-W5VbL2iJxRj7UXk1MvtXe8fxdqQt3aTSAz3fRrRPIlI='; script-src 'sha256-xWdhMaKXa10mWlRzaVKsKWSGKWY+daImnJWuSjz4FCM='; base-uri 'self'; form-action 'none'; object-src 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
   <title>Página não encontrada · Clínica Sorriso Pleno</title>
   <meta name="robots" content="noindex">
+  <meta name="color-scheme" content="light dark">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f7fb">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e1118">
   <!--
@@ -63,9 +79,11 @@
     // Caminhos internos da aplicação começam com o fragmento "#" e nunca
     // chegam até aqui — este script só trata caminhos realmente inexistentes.
     // Detecção pelo CAMINHO (não pelo hostname): funciona igual em
-    // localhost, no project page e no domínio próprio, sem edição.
+    // localhost, no project page e no domínio próprio, sem edição. Com
+    // domínio próprio o destino é sempre "/" e a detecção perde a função
+    // (pode ser simplificada — ver docs/DOMINIO.md).
     (function () {
-      var repositorio = "simple_single_page_app";
+      var repositorio = "simple_web_app";
       var segmentos = location.pathname.split("/").filter(Boolean);
       var naRaizDoProjeto = segmentos[0] === repositorio;
       var destino = naRaizDoProjeto ? "/" + repositorio + "/" : "/";

@@ -14,19 +14,19 @@
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://pgillets.github.io/simple_single_page_app/</loc>
+    <loc>https://pgillets.github.io/simple_web_app/</loc>
     <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://pgillets.github.io/simple_single_page_app/sobre.html</loc>
+    <loc>https://pgillets.github.io/simple_web_app/sobre.html</loc>
     <lastmod>2026-07-10</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://pgillets.github.io/simple_single_page_app/contato.html</loc>
+    <loc>https://pgillets.github.io/simple_web_app/contato.html</loc>
     <lastmod>2026-07-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

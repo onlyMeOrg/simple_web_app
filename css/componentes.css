@@ -351,3 +351,34 @@ th {
 .toast.visivel {
   translate: 0 0;
 }
+
+/* ===== Faixa de cookies (consentimento.js — só aparece com o GTM ligado) ===== */
+
+.faixa-cookies {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  border-top: 1px solid var(--cor-borda);
+  box-shadow: var(--sombra);
+  padding: 1rem 1.25rem;
+}
+
+.faixa-cookies p {
+  margin: 0;
+  flex: 1 1 20rem;
+  font-size: 0.9rem;
+  color: var(--cor-texto-suave);
+}
+
+.faixa-cookies .grupo-botoes {
+  flex: 0 0 auto;
+}

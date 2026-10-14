@@ -15,6 +15,9 @@ jobs:
         with:
           node-version: "22"
       - run: npx --yes html-validate "**/*.html"
+      # 404.html libera o CSS/JS embutidos por hash na CSP: editar um dos dois
+      # sem recalcular quebraria a página em produção, em silêncio.
+      - run: python3 tools/hash-csp-404.py --checar
 
   check-links:
     name: Verificar links
@@ -28,10 +31,17 @@ jobs:
           # criaria uma dependência circular (o CI de um push/PR passaria a depender
           # do Pages já estar publicado e propagado, o que é instável e nem sempre
           # verdadeiro, sobretudo antes do primeiro deploy ou em forks).
+          # wa.me / instagram.com / facebook.com: bloqueiam ou limitam bots
+          # (403/429) de forma instável — não é sinal útil de link quebrado.
+          # localhost: exemplos de desenvolvimento citados no README.
           args: >-
             --no-progress
             --accept 200..=204,429
             --exclude "https://api\.github\.com.*"
             --exclude "https://pgillets\.github\.io.*"
+            --exclude "https://wa\.me.*"
+            --exclude "https://www\.instagram\.com.*"
+            --exclude "https://www\.facebook\.com.*"
+            --exclude "http://localhost.*"
             "**/*.html" "**/*.md"
           fail: true

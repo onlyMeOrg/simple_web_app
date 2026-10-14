@@ -6,4 +6,4 @@ User-agent: *
 Allow: /
 
 # Atualize esta URL quando o domínio próprio entrar (ver docs/DOMINIO.md).
-Sitemap: https://pgillets.github.io/simple_single_page_app/sitemap.xml
+Sitemap: https://pgillets.github.io/simple_web_app/sitemap.xml

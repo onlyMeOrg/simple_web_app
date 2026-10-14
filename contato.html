@@ -11,15 +11,22 @@
   <meta name="description" content="Endereço, telefone, e-mail e horário de atendimento da Clínica Sorriso Pleno em São Paulo. Fale conosco pelo WhatsApp ou agende sua visita.">
 
   <!-- Únicas URLs absolutas desta página: atualize para o seu domínio ao publicar (ver docs/DOMINIO.md). -->
-  <link rel="canonical" href="https://pgillets.github.io/simple_single_page_app/contato.html">
+  <link rel="canonical" href="https://pgillets.github.io/simple_web_app/contato.html">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Clínica Sorriso Pleno">
   <meta property="og:title" content="Contato — Clínica Sorriso Pleno em São Paulo">
   <meta property="og:description" content="Endereço, telefone e horário de atendimento. Fale conosco pelo WhatsApp ou agende sua visita.">
-  <meta property="og:url" content="https://pgillets.github.io/simple_single_page_app/contato.html">
-  <meta property="og:image" content="https://pgillets.github.io/simple_single_page_app/assets/og-capa-negocio.png">
+  <meta property="og:url" content="https://pgillets.github.io/simple_web_app/contato.html">
+  <meta property="og:image" content="https://pgillets.github.io/simple_web_app/assets/og-capa-negocio.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:locale" content="pt_BR">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Contato — Clínica Sorriso Pleno em São Paulo">
+  <meta name="twitter:description" content="Endereço, telefone e horário de atendimento. Fale conosco pelo WhatsApp ou agende sua visita.">
+  <meta name="twitter:image" content="https://pgillets.github.io/simple_web_app/assets/og-capa-negocio.png">
 
+  <meta name="color-scheme" content="light dark">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f7fb">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e1118">
 
@@ -39,7 +46,12 @@
   <a class="pular" href="#conteudo">Pular para o conteúdo</a>
 
   <header class="topo">
-    <cabecalho-site class="topo-conteudo" data-pagina="contato" nome-negocio="Clínica Sorriso Pleno"></cabecalho-site>
+    <cabecalho-site class="topo-conteudo" data-pagina="contato" nome-negocio="Clínica Sorriso Pleno">
+      <a class="marca" href="./index.html">
+        <img src="./assets/favicon.svg" alt="" width="22" height="22">
+        <span>Clínica Sorriso Pleno</span>
+      </a>
+    </cabecalho-site>
     <noscript>
       <nav class="topo-conteudo" aria-label="Navegação principal">
         <a href="./index.html">Início</a>
@@ -65,14 +77,14 @@
         <div class="contato-info">
           <p>
             <strong>Endereço:</strong> Rua Exemplo, 123 — São Paulo, SP
-            <a href="https://www.google.com/maps/search/?api=1&query=Rua+Exemplo+123+São+Paulo+SP" target="_blank" rel="noopener">Ver no mapa</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=Rua+Exemplo+123+São+Paulo+SP" target="_blank" rel="noopener noreferrer">Ver no mapa</a>
           </p>
           <p><strong>Telefone:</strong> <a href="tel:+551140000000">(11)&nbsp;4000&#8209;0000</a></p>
           <p><strong>E-mail:</strong> <a href="mailto:contato@clinicaexemplo.com.br">contato@clinicaexemplo.com.br</a></p>
           <p><strong>Horário:</strong> Segunda a sexta, das 9h às 18h</p>
         </div>
         <div class="grupo-botoes">
-          <a class="botao botao-primario" href="https://wa.me/5511999999999" target="_blank" rel="noopener">Falar no WhatsApp</a>
+          <a class="botao botao-primario" href="https://wa.me/5511999999999?utm_content=contato_botao" target="_blank" rel="noopener noreferrer">Falar no WhatsApp</a>
         </div>
       </div>
     </section>
@@ -85,7 +97,8 @@
         <p>Rua Exemplo, 123 — São Paulo, SP · (11)&nbsp;4000&#8209;0000</p>
       </div>
       <p>
-        <a href="https://github.com/pgillets/simple_single_page_app">Código no GitHub</a>
+        <a href="./privacidade.html">Política de Privacidade</a><span class="gerenciar-cookies-item" hidden>
+        · <a href="#" class="gerenciar-cookies">Gerenciar cookies</a></span>
       </p>
     </div>
   </footer>

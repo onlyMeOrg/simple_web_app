@@ -2,7 +2,7 @@
  * sw.js — service worker do "app shell", na raiz do repositório de propósito:
  * o escopo padrão de um service worker é o diretório de onde ele é servido,
  * então ficar na raiz garante escopo = base do site tanto em
- * /simple_single_page_app/ (project page) quanto em / (domínio próprio).
+ * /simple_web_app/ (project page) quanto em / (domínio próprio).
  *
  * Estratégia: NETWORK-FIRST para tudo same-origin (navegação e assets do
  * shell), com fallback ao cache. O GitHub Pages já manda os arquivos com
@@ -10,13 +10,14 @@
  * mais uma camada de staleness em cima disso. Network-first elimina o
  * clássico "publiquei e continuo vendo a versão antiga".
  *
- * A API do GitHub e afins (cross-origin) nunca são interceptadas: passam direto.
+ * Requisições cross-origin (Google Tag Manager, Pixel da Meta, quando
+ * ligados — ver docs/ANALYTICS.md) nunca são interceptadas: passam direto.
  *
  * Ao publicar uma mudança em qualquer arquivo do PRECACHE, suba a VERSAO —
  * é o gatilho que faz o activate() descartar o cache antigo.
  */
 
-const VERSAO = "v5";
+const VERSAO = "v6";
 const CACHE = `shell-${VERSAO}`;
 
 // As 4 páginas do site — usadas também pelo fallback de navegação offline
@@ -27,6 +28,7 @@ const PRECACHE = [
   "./",
   ...PAGINAS,
   "./404.html",
+  "./privacidade.html",
   "./manifest.webmanifest",
   "./css/tokens.css",
   "./css/base.css",
@@ -37,6 +39,7 @@ const PRECACHE = [
   "./js/site.js",
   "./js/galeria.js",
   "./js/sw-registro.js",
+  "./js/consentimento.js",
   "./js/componentes/cabecalho-site.js",
   "./js/componentes/selo-status.js",
   "./js/componentes/estrela-avaliacao.js",
@@ -93,7 +96,7 @@ self.addEventListener("fetch", (evento) => {
   if (requisicao.method !== "GET") return;
 
   const url = new URL(requisicao.url);
-  if (url.origin !== self.location.origin) return; // API do GitHub e afins: passam direto
+  if (url.origin !== self.location.origin) return; // GTM, Pixel e afins: passam direto
 
   evento.respondWith(networkFirst(requisicao));
 });
