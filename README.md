@@ -24,11 +24,18 @@ prontos — veja a seção [SEO](#seo) abaixo.
 | **`sobre.html`** | História da empresa, números e depoimentos completos. | Sim |
 | **`contato.html`** | Endereço, telefone, e-mail, horário — a página de conversão. | Sim |
 | **`galeria.html`** | Fotos do espaço/produto. Pouco texto único, então **não** compete por posição no Google — veja [SEO](#seo). | Não (`noindex`) |
+| **`privacidade.html`** | Política de privacidade e cookies, linkada pelo rodapé. Fora do menu. | Não (`noindex`) |
 
-Adicionar uma página nova ao template é: criar o arquivo `.html` seguindo o padrão dos
-outros (cabeçalho compartilhado + `<main>` próprio + rodapé), adicionar a entrada no
-array `PAGINAS` de `js/componentes/cabecalho-site.js`, e decidir se ela entra no
-`sitemap.xml`.
+Adicionar uma página nova ao template:
+
+1. Criar o arquivo `.html` seguindo o padrão dos outros (cabeçalho compartilhado +
+   `<main>` próprio + rodapé).
+2. Adicionar a entrada no array `PAGINAS` de `js/componentes/cabecalho-site.js` **e** o
+   mesmo link no `<noscript>` de todas as páginas (o menu de quem está sem JS).
+3. Acrescentar o arquivo ao `PAGINAS` de `sw.js` e subir a `VERSAO`.
+4. Decidir se ela é indexável: se sim, entra no `sitemap.xml`; se não, leva
+   `<meta name="robots" content="noindex, follow">` e fica fora dele.
+5. Rodar `python3 tools/checar-site.py`, que confere os passos 2 a 4 (o CI também roda).
 
 ## SEO
 
@@ -39,8 +46,12 @@ O que já vem pronto, para você ajustar com os dados reais do negócio:
   redes sociais e visitantes mesmo sem JS. Só o cabeçalho/menu compartilhado
   (`<cabecalho-site>`) depende de JavaScript para aparecer — cada página tem um
   `<noscript>` com os mesmos links em texto puro como rede de segurança.
-- **Meta tags completas por página**: `title`, `description`, `canonical`, Open Graph e
-  Twitter Card.
+- **Meta tags completas por página**: `title`, `description`, `canonical`, Open Graph
+  (com `og:site_name` e as dimensões da `og:image`) e Twitter Card completo
+  (`twitter:title`, `twitter:description`, `twitter:image`).
+- **Marca no HTML servido**: o ícone e o nome do negócio vêm como markup estático dentro
+  de `<cabecalho-site>` — visíveis a crawlers que não executam JavaScript. O componente
+  só acrescenta o menu e o botão de tema.
 - **Dados estruturados (JSON-LD)**: um bloco `schema.org/Dentist` (subtipo de
   `LocalBusiness`) com nome, endereço, telefone, horário e avaliação — vive **só** em
   `index.html` (a URL canônica do negócio), não repetido em toda página, para não
@@ -68,8 +79,13 @@ O que já vem pronto, para você ajustar com os dados reais do negócio:
 6. Atualize `title`, `description`, `canonical`, `og:url`, `og:image` em cada página e
    os campos do JSON-LD em `index.html` com os dados reais.
 7. Atualize a URL em `robots.txt` e em `sitemap.xml` (troque pelo seu domínio final).
-8. Publique (veja abaixo) e, se quiser, configure um domínio próprio
-   ([`docs/DOMINIO.md`](docs/DOMINIO.md)).
+8. Dê a cada botão de WhatsApp um `?utm_content=<pagina>_<secao>` próprio — custa nada
+   agora e deixa o rastreamento por botão pronto para quando houver anúncios
+   ([`docs/ANALYTICS.md`](docs/ANALYTICS.md)). Mensagem pré-preenchida (`text=`) **sem
+   emoji**.
+9. Revise `privacidade.html` com quem responde pelo negócio.
+10. Publique (veja abaixo) e, se quiser, configure um domínio próprio
+    ([`docs/DOMINIO.md`](docs/DOMINIO.md)).
 
 ## Como funciona
 
@@ -87,9 +103,17 @@ O que já vem pronto, para você ajustar com os dados reais do negócio:
 - **PWA discreta**: um service worker *network-first* garante que as 4 páginas
   funcionem offline sem o efeito colateral clássico de "publiquei e ainda vejo a
   versão antiga".
-- **Content-Security-Policy** estrita via `<meta>` — por isso não há nenhum script ou
-  estilo inline em nenhuma página (os dados estruturados JSON-LD são dado inerte, não
-  código, e não precisam de exceção na CSP).
+- **Content-Security-Policy** estrita via `<meta>` em **todas** as páginas, inclusive o
+  `404.html` — por isso não há script ou estilo inline nas páginas de conteúdo (os dados
+  estruturados JSON-LD são dado inerte, não código, e não precisam de exceção na CSP). O
+  `404.html` é a exceção controlada: é servido em qualquer caminho inexistente, até
+  aninhado (`/a/b/c`), onde um `./css/...` relativo não resolveria; então o CSS e o JS
+  dele ficam embutidos e liberados **por hash** na CSP. Editou um dos dois? Rode
+  `python3 tools/hash-csp-404.py` (o CI confere).
+- **Analytics prontos, mas desligados**: um gate de consentimento (`js/consentimento.js`)
+  carrega o Google Tag Manager só depois do "Aceitar" na faixa de cookies. Com o ID do
+  contêiner vazio (o padrão), nada aparece e nada de terceiro carrega. Para ligar:
+  [`docs/ANALYTICS.md`](docs/ANALYTICS.md).
 
 ## Rodando localmente
 
@@ -135,12 +159,114 @@ nenhuma alteração: todos os caminhos internos já são relativos.
 
 Ao publicar uma mudança que afete algum arquivo listado no `sw.js`, suba a constante
 `VERSAO` nesse arquivo — é o gatilho que faz o service worker descartar o cache antigo
-e avisar quem já tem o site aberto.
+e avisar quem já tem o site aberto. Um arquivo novo que as páginas carregam (fonte,
+logo, script) também precisa entrar no `PRECACHE` — junto com o bump.
+
+No `sitemap.xml`, só atualize o `lastmod` das páginas cujo **conteúdo** mudou de
+verdade.
+
+Botão de WhatsApp novo: `utm_content` próprio, rótulo em `ROTULOS` de
+`tools/gerar-gtm.py` e rodar o script de novo (se o GTM estiver ligado).
+
+Antes do push: `python3 tools/checar-site.py` confere PRECACHE, menu sem JS, sitemap e
+links de WhatsApp; `python3 tools/hash-csp-404.py --checar`, a CSP do `404.html`. O CI
+roda os dois.
+
+## Lições de projetos reais
+
+Aprendizados de um site de cliente feito a partir deste template, em produção desde
+2026. Não estão no exemplo (são específicos de cada marca), mas valem a cada projeto.
+
+### Tema, cores e marca
+
+- **`<meta name="color-scheme" content="light dark">` no `<head>`**, além do
+  `color-scheme` do CSS. O Samsung Internet tem um "modo escuro para sites" que
+  reprocessa as cores por cima do tema da página (fundo quase preto, logo sumindo); essa
+  meta é um sinal extra que alguns desses motores respeitam. Já vem em todas as páginas.
+- **Logo com duas artes, não `filter: invert()`**: se o manual da marca tem a versão
+  clara e a escura, ponha as duas no cabeçalho e deixe o CSS mostrar a do tema — o nome
+  acessível fica no `aria-label` do link `.marca`, e as imagens ficam `alt=""`:
+
+  ```css
+  .marca-logo--escuro { display: none; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tema="claro"]) .marca-logo--claro { display: none; }
+    :root:not([data-tema="claro"]) .marca-logo--escuro { display: block; }
+  }
+  :root[data-tema="escuro"] .marca-logo--claro { display: none; }
+  :root[data-tema="escuro"] .marca-logo--escuro { display: block; }
+  ```
+
+  (A regra aparece duas vezes pelo mesmo motivo do bloco escuro de `css/tokens.css`:
+  preferência do sistema + escolha manual.)
+- **Tema escuro que a marca não define**: derive uma escala escura da cor secundária da
+  marca (mesma matiz, escurecida) e confira o contraste de cada par texto/fundo (WCAG
+  AA). Anote no topo de `tokens.css` de onde veio cada cor.
+
+### Fontes da marca
+
+- **Auto-hospede em `woff2`** (`assets/fontes/`) em vez de Google Fonts: a CSP fica em
+  `style-src 'self'; font-src 'self'` e nenhuma requisição sai para terceiros. Converter:
+  `python3 -c "from fontTools.ttLib import TTFont; f=TTFont('X.ttf'); f.flavor='woff2'; f.save('x.woff2')"`
+  (`pip install fonttools brotli`).
+- **Declare pesos como faixa** (`font-weight: 600 900` no arquivo Heavy) para que os
+  600/700/800 do CSS resolvam para o arquivo real, sem negrito sintetizado.
+- **Fonte manuscrita/de exibição só em acentos curtos** (uma palavra de um título), com
+  `font-weight: 400` (senão o `h1` sintetiza negrito), `letter-spacing: normal` (o
+  negativo dos títulos cola as ligaduras) e tamanho compensado (~`1.45em`, a altura-x
+  costuma ser bem menor). Cursivas descem muito abaixo da linha de base: dê
+  `padding-bottom` só ao título que tem o trecho, com `:has()`.
+- Fonte nova que o CSS passa a usar entra no `PRECACHE` do `sw.js`. Um `@font-face`
+  que nenhuma regra usa não é baixado — não precisa entrar antes disso.
+- **Licença**: `.ttf`/`.otf` costumam vir com licença *desktop*; servir como webfont
+  deixa o arquivo baixável e normalmente exige licença *web*. Confirme com o
+  fornecedor e registre a decisão no README do projeto.
+
+### Ícones e capa de compartilhamento
+
+- **Nunca use `<text font-family="...">` num favicon SVG**: nenhuma webfont carrega
+  ali, e o navegador desenha a letra em Arial. Extraia o contorno do glifo da fonte
+  (`fontTools`) e embuta como `<path>`.
+- **Ícone `maskable` com margem**: o Android recorta dentro de um círculo de 80% do
+  lado. Deixe o desenho bem dentro disso (num glifo largo, ~60% da largura).
+- **Gere a `og:image` (1200×630) por script** (ex.: Pillow desenhando com a fonte da
+  marca convertida de `woff2` para `ttf` em memória), não por captura de navegador: uma
+  captura em que a webfont não carregou a tempo sai em fonte genérica — e ninguém
+  percebe até compartilhar o link.
+
+### CI
+
+- Nada de `style="..."` no HTML (o `html-validate` reprova) — use uma classe.
+- URLs `http://localhost...` no README em `código`, não como link: o lychee tenta
+  acessá-las. (Já há um `--exclude` para elas, por garantia.)
+- Redes sociais (`wa.me`, Instagram, Facebook) bloqueiam bots de forma instável e já
+  estão fora da checagem de links.
+
+### Site de cliente
+
+- **O rodapé não deve linkar o repositório.** O Pages gratuito exige repositório
+  público; tirar o link só deixa de divulgá-lo — vale avisar o cliente.
+- **Fidelidade ao texto do cliente**: ao receber um documento de conteúdo, não condense
+  parágrafos, não funda listas nem troque títulos por conta própria — o cliente percebe
+  e pede de volta. Se o texto não cabe no layout, mude o layout.
+- **Duas fontes do cliente divergem** (o documento escrito e um áudio, por exemplo)?
+  Não decida por dedução: registre a divergência no README como pendência e pergunte.
+- **Preços**: quando o mesmo valor aparece em várias páginas (ou "a partir de" numa e
+  cheio na outra), mantenha no README uma tabela "onde cada número aparece". Explicite
+  condições ("por pessoa", "em dupla", "por casal") em todo lugar que mostrar o número.
+- **Separe pendência de decisão** no README: o que falta (fotos reais, avaliações) e o
+  que foi decidido conscientemente (ex.: "sob consulta", licença de fonte mantida),
+  com data — evita reabrir a mesma discussão.
+- **Avaliações do Google**: sem avaliações reais publicadas, tire o `aggregateRating`
+  do JSON-LD e as estrelas da página. Para mostrá-las depois, citações copiadas do perfil
+  são o caminho simples; um widget ao vivo exige chave da API Places (com billing) ou
+  serviço de terceiro, e abre a CSP.
 
 ## Estrutura de arquivos
 
 ```
 index.html, sobre.html, contato.html, galeria.html   → as 4 páginas do site
+privacidade.html                                     → política de privacidade (noindex)
 404.html, manifest.webmanifest, sw.js                → casca compartilhada e PWA
 robots.txt, sitemap.xml                              → infraestrutura de SEO
 css/
@@ -149,7 +275,8 @@ css/
   componentes.css → cabeçalho, navegação, botões, selos, tabelas
   negocio.css     → estilos de conteúdo (serviços, depoimentos, contato, galeria)
 js/
-  site.js               → entrada compartilhada pelas 4 páginas: cabeçalho, tema, SW
+  site.js               → entrada compartilhada pelas páginas: cabeçalho, tema, SW, consentimento
+  consentimento.js      → faixa de cookies + Google Tag Manager (desligado por padrão)
   galeria.js            → só em galeria.html: lightbox via <dialog> nativo
   tema.js, tema-boot.js, sw-registro.js
                         → núcleo compartilhado (tema claro/escuro, service worker)
@@ -161,7 +288,13 @@ assets/
   galeria/          → fotos de exemplo da página galeria.html
   favicon.svg, icones/, og-capa-negocio.png
 docs/DOMINIO.md     → runbook de domínio personalizado
-tools/servidor.py   → servidor de desenvolvimento (stdlib, sem dependências)
+docs/ANALYTICS.md   → como ligar GTM/GA4/Ads/Pixel (CSP já mapeada)
+docs/DECISAO-STACK.md → zero-build × Astro: análise com dados e recomendação
+tools/
+  servidor.py       → servidor de desenvolvimento (stdlib, sem dependências)
+  checar-site.py    → confere PRECACHE, menu sem JS, sitemap e links de WhatsApp (CI)
+  hash-csp-404.py   → recalcula a CSP do 404.html (o CI confere)
+  gerar-gtm.py      → contêiner do GTM importável, um evento por botão de WhatsApp
 .github/workflows/ci.yml → validação de HTML e links a cada push/PR
 ```
 
@@ -221,8 +354,16 @@ fields, then update the URLs in `robots.txt`/`sitemap.xml` to your final domain.
   page.
 - **Zero build**: native ES Modules, resolved by the browser itself.
 - **A tame PWA**: a network-first service worker makes all 4 pages work offline.
-- **Strict Content-Security-Policy** via `<meta>` — the JSON-LD block is inert data,
-  not code, so it needs no CSP exception.
+- **Strict Content-Security-Policy** via `<meta>` on every page — the JSON-LD block is
+  inert data, not code, so it needs no CSP exception. `404.html` keeps its CSS/JS inline
+  (it is served at any missing path, even nested ones) and allows them **by hash**;
+  `tools/hash-csp-404.py` recomputes it and CI checks it.
+- **Analytics ready but off**: a consent gate loads Google Tag Manager only after the
+  visitor accepts the cookie banner. See [`docs/ANALYTICS.md`](docs/ANALYTICS.md) for
+  the two-step activation and the CSP allow-list learned in production.
+- **Lessons from a real client site** (forced dark mode on Samsung Internet, self-hosted
+  brand fonts, favicon glyphs as paths, deterministic og:image, client-content
+  workflow) are collected in [Lições de projetos reais](#lições-de-projetos-reais).
 
 ### Local development
 

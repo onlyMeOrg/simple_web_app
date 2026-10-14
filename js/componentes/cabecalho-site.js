@@ -11,10 +11,20 @@
  * O único lugar a editar para adicionar, renomear ou remover uma página do
  * site é o array PAGINAS abaixo.
  *
+ * A marca (ícone + nome do negócio) já vem como markup estático dentro de
+ * <cabecalho-site> em cada página — assim ela existe no HTML servido,
+ * visível a crawlers que não executam JavaScript. Este componente só a
+ * reaproveita; se a página não a incluir, cria uma como fallback.
+ *
  * Uso (em cada página):
  *   <header class="topo">
  *     <cabecalho-site class="topo-conteudo" data-pagina="sobre"
- *                     nome-negocio="Clínica Sorriso Pleno"></cabecalho-site>
+ *                     nome-negocio="Clínica Sorriso Pleno">
+ *       <a class="marca" href="./index.html">
+ *         <img src="./assets/favicon.svg" alt="" width="22" height="22">
+ *         <span>Clínica Sorriso Pleno</span>
+ *       </a>
+ *     </cabecalho-site>
  *     <noscript>...link de navegação em texto puro...</noscript>
  *   </header>
  *
@@ -42,17 +52,22 @@ class CabecalhoSite extends HTMLElement {
     const nomeDoNegocio = this.getAttribute("nome-negocio") ?? "";
     const paginaAtual = this.getAttribute("data-pagina") ?? "";
 
-    const marca = document.createElement("a");
-    marca.className = "marca";
-    marca.href = "./index.html";
-    const icone = document.createElement("img");
-    icone.src = "./assets/favicon.svg";
-    icone.alt = "";
-    icone.width = 22;
-    icone.height = 22;
-    const nomeSpan = document.createElement("span");
-    nomeSpan.textContent = nomeDoNegocio;
-    marca.append(icone, nomeSpan);
+    // A marca normalmente já vem como markup estático (ver comentário acima).
+    // Fallback: cria caso a página não a inclua.
+    if (!this.querySelector(".marca")) {
+      const marca = document.createElement("a");
+      marca.className = "marca";
+      marca.href = "./index.html";
+      const icone = document.createElement("img");
+      icone.src = "./assets/favicon.svg";
+      icone.alt = "";
+      icone.width = 22;
+      icone.height = 22;
+      const nomeSpan = document.createElement("span");
+      nomeSpan.textContent = nomeDoNegocio;
+      marca.append(icone, nomeSpan);
+      this.append(marca);
+    }
 
     const nav = document.createElement("nav");
     nav.setAttribute("aria-label", "Navegação principal");
@@ -71,7 +86,7 @@ class CabecalhoSite extends HTMLElement {
     botaoTema.id = "alternar-tema";
     botaoTema.setAttribute("aria-label", "Alternar tema");
 
-    this.append(marca, nav, botaoTema);
+    this.append(nav, botaoTema);
   }
 }
 

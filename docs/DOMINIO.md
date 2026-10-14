@@ -6,7 +6,7 @@
 > **zero changes** — every internal path across the site's pages is already relative.
 
 Este guia é executado **quando** houver um domínio escolhido. Até lá, o site vive em
-`https://pgillets.github.io/simple_single_page_app/` e nada aqui precisa ser feito.
+`https://pgillets.github.io/simple_web_app/` e nada aqui precisa ser feito.
 
 ## 1. Visão geral
 
@@ -54,9 +54,29 @@ futuro enquanto o DNS ainda aponta para o GitHub.
 | CNAME | `www` (ou o subdomínio) | `pgillets.github.io.` |
 
 Atenção: o CNAME aponta para `pgillets.github.io`, **nunca** para
-`pgillets.github.io/simple_single_page_app`.
+`pgillets.github.io/simple_web_app`.
+
+Antes de trocar qualquer coisa, **fotografe a zona atual** (nameservers, A, MX, TXT):
+
+- **Registro MX** existe? Então há e-mail no domínio — não mexa nele (a troca acima só
+  envolve A/AAAA do apex e o CNAME do `www`). Sem MX, a troca não derruba caixa nenhuma.
+- **TXT** de `_dmarc`, SPF ou verificações (Google, Meta): deixe intactos.
+- **Registros A de estacionamento** do registrador (ex.: GoDaddy, `13.248.243.5` e
+  `76.223.105.230`): remova-os — conflitam com os do GitHub.
+
+Para conferir depois da propagação (deve listar os quatro `185.199.x.153`):
+
+```bash
+python3 -c "import socket; print(sorted({i[4][0] for i in socket.getaddrinfo('exemplo.com.br', 443)}))"
+```
 
 Outros cuidados:
+- **GoDaddy: desligue o redirecionamento** (*Domain Settings → Forwarding*) **antes** de
+  salvar o DNS. Os A de estacionamento vêm desse *forwarding*; com ele ativo, a GoDaddy
+  recria os registros e sobrescreve os do GitHub. Outros registradores têm recursos
+  equivalentes ("URL redirect", "parking") — desligue também.
+- O `www` como CNAME já basta para o Pages redirecionar `www` → apex com 301; não
+  configure redirecionamento no registrador.
 - Se a zona tiver um registro **CAA**, ele precisa permitir `letsencrypt.org`, ou a
   emissão do certificado HTTPS falha silenciosamente.
 - Reduza o **TTL** dos registros antigos para algo baixo (ex.: 300s) um pouco antes da
@@ -91,15 +111,24 @@ O código da aplicação não precisa de nenhuma mudança — todos os caminhos 
 (CSS, JS, imagens, links entre páginas) já são relativos e funcionam em qualquer base.
 O que **vale a pena** atualizar, por serem as únicas URLs absolutas do projeto:
 
-- [ ] `index.html`: `<link rel="canonical">`, `og:url`, `og:image` e as URLs dentro do
+- [ ] `index.html`: `<link rel="canonical">`, `og:url`, `og:image`, `twitter:image` e as URLs dentro do
       bloco `<script type="application/ld+json">` → novo domínio.
-- [ ] `sobre.html`, `contato.html`, `galeria.html`: `<link rel="canonical">`, `og:url`,
-      `og:image` → novo domínio.
+- [ ] `sobre.html`, `contato.html`, `galeria.html`, `privacidade.html`:
+      `<link rel="canonical">`, `og:url`, `og:image`, `twitter:image` → novo domínio.
 - [ ] `robots.txt`: a linha `Sitemap:` → novo domínio.
 - [ ] `sitemap.xml`: a(s) `<loc>` → novo domínio (já existem desde o início — só
       trocar a URL, não recriar).
+- [ ] `.github/workflows/ci.yml`: troque o `--exclude` de `pgillets\.github\.io` pelo
+      domínio novo — o lychee não deve checar a própria URL de produção (dependência
+      circular entre o CI e o Pages publicado).
+- [ ] `404.html`: com domínio próprio o destino do redirecionamento é sempre `/`; a
+      detecção do subcaminho do project page pode virar `var destino = "/";` (depois,
+      `python3 tools/hash-csp-404.py`). `tools/servidor.py --base` também deixa de ser
+      necessário.
 - [ ] Atualizar as URLs mencionadas no `README.md`.
-- [ ] Nada a fazer com a URL antiga: `pgillets.github.io/simple_single_page_app/`
+- [ ] Se usar a Meta (Pixel/anúncios), verifique o domínio novo por meta tag — ver
+      [`ANALYTICS.md`](ANALYTICS.md#armadilhas-já-pisadas).
+- [ ] Nada a fazer com a URL antiga: `pgillets.github.io/simple_web_app/`
       passa a redirecionar (301) para o domínio novo automaticamente.
 
 ## 8. Solução de problemas

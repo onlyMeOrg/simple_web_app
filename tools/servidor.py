@@ -12,9 +12,9 @@ importam para esta SPA:
 
 Uso:
   python3 tools/servidor.py                     # serve a raiz em /
-  python3 tools/servidor.py --base simple_single_page_app
+  python3 tools/servidor.py --base simple_web_app
                                                   # simula o project page,
-                                                  # servindo em /simple_single_page_app/
+                                                  # servindo em /simple_web_app/
                                                   # -- o ensaio da migração de domínio
   python3 tools/servidor.py --porta 8080
 """

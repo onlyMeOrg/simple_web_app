@@ -19,15 +19,22 @@
   <title>Galeria de fotos — Clínica Sorriso Pleno</title>
   <meta name="description" content="Fotos do consultório e da equipe da Clínica Sorriso Pleno.">
 
-  <link rel="canonical" href="https://pgillets.github.io/simple_single_page_app/galeria.html">
+  <link rel="canonical" href="https://pgillets.github.io/simple_web_app/galeria.html">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Clínica Sorriso Pleno">
   <meta property="og:title" content="Galeria de fotos — Clínica Sorriso Pleno">
   <meta property="og:description" content="Fotos do consultório e da equipe da Clínica Sorriso Pleno.">
-  <meta property="og:url" content="https://pgillets.github.io/simple_single_page_app/galeria.html">
-  <meta property="og:image" content="https://pgillets.github.io/simple_single_page_app/assets/og-capa-negocio.png">
+  <meta property="og:url" content="https://pgillets.github.io/simple_web_app/galeria.html">
+  <meta property="og:image" content="https://pgillets.github.io/simple_web_app/assets/og-capa-negocio.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:locale" content="pt_BR">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Galeria de fotos — Clínica Sorriso Pleno">
+  <meta name="twitter:description" content="Fotos do consultório e da equipe da Clínica Sorriso Pleno.">
+  <meta name="twitter:image" content="https://pgillets.github.io/simple_web_app/assets/og-capa-negocio.png">
 
+  <meta name="color-scheme" content="light dark">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f7fb">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e1118">
 
@@ -48,7 +55,12 @@
   <a class="pular" href="#conteudo">Pular para o conteúdo</a>
 
   <header class="topo">
-    <cabecalho-site class="topo-conteudo" data-pagina="galeria" nome-negocio="Clínica Sorriso Pleno"></cabecalho-site>
+    <cabecalho-site class="topo-conteudo" data-pagina="galeria" nome-negocio="Clínica Sorriso Pleno">
+      <a class="marca" href="./index.html">
+        <img src="./assets/favicon.svg" alt="" width="22" height="22">
+        <span>Clínica Sorriso Pleno</span>
+      </a>
+    </cabecalho-site>
     <noscript>
       <nav class="topo-conteudo" aria-label="Navegação principal">
         <a href="./index.html">Início</a>
@@ -114,7 +126,7 @@
       <h2>Gostou do nosso espaço?</h2>
       <p class="lide">Agende sua visita e conheça pessoalmente.</p>
       <div class="grupo-botoes">
-        <a class="botao botao-primario" href="https://wa.me/5511999999999" target="_blank" rel="noopener">Agendar pelo WhatsApp</a>
+        <a class="botao botao-primario" href="https://wa.me/5511999999999?utm_content=galeria_cta_final" target="_blank" rel="noopener noreferrer">Agendar pelo WhatsApp</a>
         <a class="botao" href="./contato.html">Ver formas de contato</a>
       </div>
     </section>
@@ -133,7 +145,8 @@
         <p>Rua Exemplo, 123 — São Paulo, SP · (11)&nbsp;4000&#8209;0000</p>
       </div>
       <p>
-        <a href="https://github.com/pgillets/simple_single_page_app">Código no GitHub</a>
+        <a href="./privacidade.html">Política de Privacidade</a><span class="gerenciar-cookies-item" hidden>
+        · <a href="#" class="gerenciar-cookies">Gerenciar cookies</a></span>
       </p>
     </div>
   </footer>

@@ -7,7 +7,8 @@
  * aqui só liga melhorias progressivas por cima: cabeçalho/navegação
  * compartilhados, tema, funcionamento offline, e os dois Web Components que
  * têm uso real de negócio (não são demonstração): <estrela-avaliacao> e
- * <selo-status>.
+ * <selo-status>. Também liga o gate de consentimento de cookies, que só
+ * carrega o Google Tag Manager depois do aceite (ver consentimento.js).
  *
  * Import do cabeçalho ANTES de iniciarTema(): customElements.define() faz o
  * upgrade de elementos já presentes no documento de forma síncrona, então o
@@ -20,12 +21,14 @@ import "./componentes/cabecalho-site.js";
 
 import { iniciarTema } from "./tema.js";
 import { registrarServiceWorker } from "./sw-registro.js";
+import { iniciarConsentimento } from "./consentimento.js";
 
 import "./componentes/selo-status.js";
 import "./componentes/estrela-avaliacao.js";
 
 iniciarTema(document.getElementById("alternar-tema"));
 registrarServiceWorker();
+iniciarConsentimento(); // não faz nada até GTM_CONTAINER_ID ser preenchido
 
 /*
  * "Aberto agora" / "Fechado no momento": calculado de verdade a partir do

@@ -42,7 +42,7 @@ export function registrarServiceWorker() {
       // "./sw.js" resolve contra a URL do documento. Como as 4 páginas do
       // site vivem todas na raiz do repositório, o caminho relativo aponta
       // para o mesmo arquivo não importa qual página fez o registro — e o
-      // escopo fica correto tanto em /simple_single_page_app/ quanto num
+      // escopo fica correto tanto em /simple_web_app/ quanto num
       // domínio próprio.
       const registro = await navigator.serviceWorker.register("./sw.js");
       vigiarAtualizacao(registro);
