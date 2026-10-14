@@ -26,10 +26,16 @@ prontos — veja a seção [SEO](#seo) abaixo.
 | **`galeria.html`** | Fotos do espaço/produto. Pouco texto único, então **não** compete por posição no Google — veja [SEO](#seo). | Não (`noindex`) |
 | **`privacidade.html`** | Política de privacidade e cookies, linkada pelo rodapé. Fora do menu. | Não (`noindex`) |
 
-Adicionar uma página nova ao template é: criar o arquivo `.html` seguindo o padrão dos
-outros (cabeçalho compartilhado + `<main>` próprio + rodapé), adicionar a entrada no
-array `PAGINAS` de `js/componentes/cabecalho-site.js`, e decidir se ela entra no
-`sitemap.xml`.
+Adicionar uma página nova ao template:
+
+1. Criar o arquivo `.html` seguindo o padrão dos outros (cabeçalho compartilhado +
+   `<main>` próprio + rodapé).
+2. Adicionar a entrada no array `PAGINAS` de `js/componentes/cabecalho-site.js` **e** o
+   mesmo link no `<noscript>` de todas as páginas (o menu de quem está sem JS).
+3. Acrescentar o arquivo ao `PAGINAS` de `sw.js` e subir a `VERSAO`.
+4. Decidir se ela é indexável: se sim, entra no `sitemap.xml`; se não, leva
+   `<meta name="robots" content="noindex, follow">` e fica fora dele.
+5. Rodar `python3 tools/checar-site.py`, que confere os passos 2 a 4 (o CI também roda).
 
 ## SEO
 
@@ -159,6 +165,13 @@ logo, script) também precisa entrar no `PRECACHE` — junto com o bump.
 No `sitemap.xml`, só atualize o `lastmod` das páginas cujo **conteúdo** mudou de
 verdade.
 
+Botão de WhatsApp novo: `utm_content` próprio, rótulo em `ROTULOS` de
+`tools/gerar-gtm.py` e rodar o script de novo (se o GTM estiver ligado).
+
+Antes do push: `python3 tools/checar-site.py` confere PRECACHE, menu sem JS, sitemap e
+links de WhatsApp; `python3 tools/hash-csp-404.py --checar`, a CSP do `404.html`. O CI
+roda os dois.
+
 ## Lições de projetos reais
 
 Aprendizados de um site de cliente feito a partir deste template, em produção desde
@@ -278,6 +291,7 @@ docs/DOMINIO.md     → runbook de domínio personalizado
 docs/ANALYTICS.md   → como ligar GTM/GA4/Ads/Pixel (CSP já mapeada)
 tools/
   servidor.py       → servidor de desenvolvimento (stdlib, sem dependências)
+  checar-site.py    → confere PRECACHE, menu sem JS, sitemap e links de WhatsApp (CI)
   hash-csp-404.py   → recalcula a CSP do 404.html (o CI confere)
   gerar-gtm.py      → contêiner do GTM importável, um evento por botão de WhatsApp
 .github/workflows/ci.yml → validação de HTML e links a cada push/PR

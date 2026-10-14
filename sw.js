@@ -20,8 +20,10 @@
 const VERSAO = "v6";
 const CACHE = `shell-${VERSAO}`;
 
-// As 4 páginas do site — usadas também pelo fallback de navegação offline
-// abaixo. Adicionar uma página nova ao template? Acrescente o arquivo aqui.
+// As páginas do menu — usadas também pelo fallback de navegação offline
+// abaixo. Adicionar uma página nova ao template? Acrescente o arquivo aqui
+// (página fora do menu, como privacidade.html, vai direto no PRECACHE).
+// tools/checar-site.py, no CI, acusa página ou arquivo esquecido.
 const PAGINAS = ["./index.html", "./sobre.html", "./contato.html", "./galeria.html"];
 
 const PRECACHE = [

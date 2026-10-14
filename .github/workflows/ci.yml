@@ -18,6 +18,8 @@ jobs:
       # 404.html libera o CSS/JS embutidos por hash na CSP: editar um dos dois
       # sem recalcular quebraria a página em produção, em silêncio.
       - run: python3 tools/hash-csp-404.py --checar
+      # PRECACHE do sw.js, <noscript> × menu, sitemap × noindex, links wa.me.
+      - run: python3 tools/checar-site.py
 
   check-links:
     name: Verificar links
